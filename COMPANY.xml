@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+- phpMyAdmin XML Dump
+- version 4.6.5.2
+- https://www.phpmyadmin.net
+-
+- Client :  localhost
+- Généré le :  Sam 15 Avril 2017 à 21:16
+- Version du serveur :  10.1.21-MariaDB
+- Version de PHP :  7.1.1
+-->
+
+<pma_xml_export version="1.0" xmlns:pma="https://www.phpmyadmin.net/some_doc_url/">
+    <!--
+    - Structure schemas
+    -->
+    <pma:structure_schemas>
+        <pma:database name="COMPANY" collation="utf8_general_ci" charset="utf8">
+            <pma:table name="DEPARTMENT">
+                CREATE TABLE `DEPARTMENT` (
+                  `DEPTNO` int(11) NOT NULL,
+                  `DEPTNAME` varchar(150) DEFAULT NULL,
+                  `LOCATION` varchar(100) DEFAULT NULL,
+                  PRIMARY KEY (`DEPTNO`),
+                  UNIQUE KEY `DEPTNAME` (`DEPTNAME`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+            </pma:table>
+            <pma:view name="department_data">
+                CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `company`.`department_data` AS select `company`.`department`.`DEPTNO` AS `DEPARTMENT_NO`,`company`.`department`.`DEPTNAME` AS `DEPARTMENT`,`company`.`department`.`LOCATION` AS `LOCATION` from `company`.`department`;
+            </pma:view>
+            <pma:table name="EMPLOYEE">
+                CREATE TABLE `EMPLOYEE` (
+                  `EMPNO` int(11) NOT NULL,
+                  `EMPNAME` varchar(120) DEFAULT NULL,
+                  `ADDRESS` varchar(200) DEFAULT NULL,
+                  `SALARY` double DEFAULT NULL,
+                  `HIRINGDATE` date DEFAULT NULL,
+                  `BIRTHDATE` date DEFAULT NULL,
+                  `DEPTNO` int(11) DEFAULT NULL,
+                  PRIMARY KEY (`EMPNO`),
+                  UNIQUE KEY `EMPNAME` (`EMPNAME`),
+                  KEY `DEPTNO` (`DEPTNO`),
+                  CONSTRAINT `employee_ibfk_1` FOREIGN KEY (`DEPTNO`) REFERENCES `DEPARTMENT` (`DEPTNO`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+            </pma:table>
+            <pma:view name="employee_data">
+                CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `company`.`employee_data` AS select `company`.`employee`.`EMPNO` AS `NUMBER`,`company`.`employee`.`EMPNAME` AS `NAME`,`company`.`employee`.`ADDRESS` AS `ADDRESS`,`company`.`employee`.`SALARY` AS `SALARY`,`company`.`employee`.`HIRINGDATE` AS `HIRING_DATE`,`company`.`employee`.`BIRTHDATE` AS `DATE_OF_BIRTH`,`company`.`employee`.`DEPTNO` AS `DEPARTMENT_NO`,`company`.`department`.`DEPTNAME` AS `DEPARTMENT` from (`company`.`employee` join `company`.`department`) where (`company`.`employee`.`DEPTNO` = `company`.`department`.`DEPTNO`);
+            </pma:view>
+            <pma:table name="EMPLOYEE_PHONES">
+                CREATE TABLE `EMPLOYEE_PHONES` (
+                  `EMPNO` int(11) NOT NULL,
+                  `PHONE` varchar(55) NOT NULL,
+                  PRIMARY KEY (`EMPNO`,`PHONE`),
+                  CONSTRAINT `employee_phones_ibfk_1` FOREIGN KEY (`EMPNO`) REFERENCES `EMPLOYEE` (`EMPNO`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+            </pma:table>
+            <pma:view name="employee_phones_data">
+                CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `company`.`employee_phones_data` AS select `company`.`employee`.`EMPNO` AS `EMPLOYEE_NO`,`company`.`employee`.`EMPNAME` AS `EMPLOYEE_NAME`,`company`.`employee_phones`.`PHONE` AS `PHONE` from (`company`.`employee` join `company`.`employee_phones`) where (`company`.`employee`.`EMPNO` = `company`.`employee_phones`.`EMPNO`);
+            </pma:view>
+            <pma:table name="PROJECT">
+                CREATE TABLE `PROJECT` (
+                  `PROJECTNO` int(11) NOT NULL,
+                  `PROJECTNAME` varchar(150) DEFAULT NULL,
+                  `LOCATION` varchar(100) DEFAULT NULL,
+                  `DEPTNO` int(11) DEFAULT NULL,
+                  PRIMARY KEY (`PROJECTNO`),
+                  UNIQUE KEY `PROJECTNAME` (`PROJECTNAME`),
+                  KEY `DEPTNO` (`DEPTNO`),
+                  CONSTRAINT `project_ibfk_1` FOREIGN KEY (`DEPTNO`) REFERENCES `DEPARTMENT` (`DEPTNO`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+            </pma:table>
+            <pma:view name="project_data">
+                CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `company`.`project_data` AS select `company`.`project`.`PROJECTNO` AS `PROJECT_NO`,`company`.`project`.`PROJECTNAME` AS `PROJECT_NAME`,`company`.`project`.`LOCATION` AS `LOCATION`,`company`.`project`.`DEPTNO` AS `DEPARTMENT_NO`,`company`.`department`.`DEPTNAME` AS `DEPARTMENT` from (`company`.`project` join `company`.`department`) where (`company`.`project`.`DEPTNO` = `company`.`department`.`DEPTNO`);
+            </pma:view>
+            <pma:table name="users">
+                CREATE TABLE `users` (
+                  `username` varchar(40) NOT NULL,
+                  `pass` varchar(40) NOT NULL,
+                  PRIMARY KEY (`username`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+            </pma:table>
+            <pma:table name="WORKON">
+                CREATE TABLE `WORKON` (
+                  `EMPNO` int(11) NOT NULL,
+                  `PROJECTNO` int(11) NOT NULL,
+                  PRIMARY KEY (`EMPNO`,`PROJECTNO`),
+                  KEY `PROJECTNO` (`PROJECTNO`),
+                  CONSTRAINT `workon_ibfk_1` FOREIGN KEY (`EMPNO`) REFERENCES `EMPLOYEE` (`EMPNO`),
+                  CONSTRAINT `workon_ibfk_2` FOREIGN KEY (`PROJECTNO`) REFERENCES `PROJECT` (`PROJECTNO`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+            </pma:table>
+            <pma:view name="workon_data">
+                CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `company`.`workon_data` AS select `company`.`workon`.`EMPNO` AS `EMPLOYEE_NO`,`company`.`employee`.`EMPNAME` AS `EMPLOYEE_NAME`,`company`.`workon`.`PROJECTNO` AS `PROJECT_NO`,`company`.`project`.`PROJECTNAME` AS `PROJECT_NAME` from ((`company`.`workon` join `company`.`employee`) join `company`.`project`) where ((`company`.`workon`.`EMPNO` = `company`.`employee`.`EMPNO`) and (`company`.`workon`.`PROJECTNO` = `company`.`project`.`PROJECTNO`));
+            </pma:view>
+        </pma:database>
+    </pma:structure_schemas>
+
+    <!--
+    - Base de données :  'COMPANY'
+    -->
+    <database name="COMPANY">
+        <!-- Table DEPARTMENT -->
+        <table name="DEPARTMENT">
+            <column name="DEPTNO">1</column>
+            <column name="DEPTNAME">Arts</column>
+            <column name="LOCATION">Oujda</column>
+        </table>
+        <table name="DEPARTMENT">
+            <column name="DEPTNO">2</column>
+            <column name="DEPTNAME">Maths</column>
+            <column name="LOCATION">Rabat</column>
+        </table>
+        <!-- Table EMPLOYEE -->
+        <!-- Table EMPLOYEE_PHONES -->
+        <!-- Table PROJECT -->
+        <!-- Table users -->
+        <table name="users">
+            <column name="username">a</column>
+            <column name="pass">a</column>
+        </table>
+        <table name="users">
+            <column name="username">admin</column>
+            <column name="pass">123</column>
+        </table>
+        <table name="users">
+            <column name="username">b</column>
+            <column name="pass">b</column>
+        </table>
+        <!-- Table WORKON -->
+    </database>
+</pma_xml_export>
